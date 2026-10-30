@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Salon Booking System"
+description = "A single-screen salon booking calculator for staff. Serves the existing Python booking form, validation, discount rules, and thank-you flow as a deployable web app."
+version = "1.0.0"
+id = "artifacts/salon-booking"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20859
+
+[services.development]
+run = "python3 ../../salon_booking.py"
+
+[services.production.run]
+args = ["python3", "-u", "salon_booking.py"]
+
+[services.production.run.env]
+PORT = "20859"
+
+[services.production.health.startup]
+path = "/"
+
+[services.env]
+PORT = "20859"
+BASE_PATH = "/"
