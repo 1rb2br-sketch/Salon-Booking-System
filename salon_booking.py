@@ -1,196 +1,346 @@
-"""A simple salon booking and discount calculator built with Tkinter."""
+"""Browser-based salon booking calculator with Python handling the booking rules."""
 
+import html
 import math
-import tkinter as tk
-from tkinter import messagebox, ttk
+import os
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs
 
 
 DISCOUNT_LIMIT = 150
 DISCOUNT_RATE = 0.15
 
 
-def main():
-    """Create and run the salon booking window."""
-    root = tk.Tk()
-    root.title("Salon Booking System")
-    root.geometry("560x680")
-    root.minsize(460, 620)
-    root.configure(bg="#f7f3ef")
+PAGE_TEMPLATE = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salon Booking System</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #292421;
+      background: #f7f3ef;
+    }
 
-    style = ttk.Style(root)
-    style.configure("TLabel", background="#f7f3ef", foreground="#292421")
-    style.configure("Title.TLabel", font=("TkDefaultFont", 22, "bold"))
-    style.configure("Subtitle.TLabel", font=("TkDefaultFont", 10))
-    style.configure("Field.TLabel", font=("TkDefaultFont", 10, "bold"))
-    style.configure("TEntry", padding=9)
-    style.configure("Primary.TButton", padding=(16, 10), font=("TkDefaultFont", 10, "bold"))
-    style.configure("TButton", padding=(12, 9), font=("TkDefaultFont", 10))
+    * { box-sizing: border-box; }
 
-    page = ttk.Frame(root, padding=(30, 28))
-    page.pack(fill="both", expand=True)
-    page.columnconfigure(0, weight=1)
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 18px;
+      display: grid;
+      place-items: center;
+      background: #f7f3ef;
+    }
 
-    ttk.Label(page, text="Salon Booking", style="Title.TLabel").grid(
-        row=0, column=0, sticky="w"
+    main {
+      width: min(100%, 560px);
+      padding: 32px;
+      border: 1px solid #e8dfd8;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 16px 42px rgba(57, 39, 26, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+    }
+
+    .intro {
+      margin: 8px 0 26px;
+      color: #716760;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      height: 46px;
+      margin: 0 0 19px;
+      padding: 0 13px;
+      border: 1px solid #d9cec5;
+      border-radius: 9px;
+      background: #fff;
+      color: #292421;
+      font: inherit;
+    }
+
+    input:focus {
+      border-color: #9a634e;
+      outline: 3px solid rgba(154, 99, 78, 0.16);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #ded5ce;
+      border-radius: 9px;
+      background: #fff;
+      color: #37302b;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #f7f3ef; }
+    button:focus-visible { outline: 3px solid rgba(154, 99, 78, 0.28); }
+
+    button.primary {
+      border-color: #87543f;
+      background: #87543f;
+      color: #fff;
+    }
+
+    button.primary:hover { background: #714330; }
+
+    .results {
+      margin-top: 24px;
+      padding: 17px;
+      border: 1px solid #e8dfd8;
+      border-radius: 12px;
+      background: #fcfaf8;
+    }
+
+    .results h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .result-copy {
+      margin: 0;
+      color: #504841;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+    }
+
+    .alert {
+      margin: 0 0 18px;
+      padding: 11px 12px;
+      border: 1px solid #e9bdb7;
+      border-radius: 8px;
+      background: #fff4f2;
+      color: #8b2f27;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 18px 12px; }
+      main { padding: 23px 18px; }
+      h1 { font-size: 24px; }
+      .buttons { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Salon Booking</h1>
+    <p class="intro">Enter the customer and service details to calculate the final price.</p>
+    <!-- APP_CONTENT -->
+  </main>
+</body>
+</html>
+"""
+
+
+def format_booking(customer_name, original_price):
+    """Apply the salon discount rule and return the booking summary."""
+    discount_amount = (
+        original_price * DISCOUNT_RATE
+        if original_price > DISCOUNT_LIMIT
+        else 0
     )
-    ttk.Label(
-        page,
-        text="Enter the customer and service details to calculate the final price.",
-        style="Subtitle.TLabel",
-        wraplength=470,
-    ).grid(row=1, column=0, sticky="w", pady=(6, 24))
+    final_price = original_price - discount_amount
 
-    form = ttk.Frame(page)
-    form.grid(row=2, column=0, sticky="ew")
-    form.columnconfigure(0, weight=1)
-
-    ttk.Label(form, text="Customer name", style="Field.TLabel").grid(
-        row=0, column=0, sticky="w"
+    return (
+        f"Customer Name: {customer_name}\n"
+        f"Original Service Price: {original_price:.2f} SAR\n"
+        f"Discount Amount: {discount_amount:.2f} SAR\n"
+        f"Final Price: {final_price:.2f} SAR\n\n"
+        f"Congratulations {customer_name}! Your booking has been completed "
+        f"successfully. The original price is {original_price:.2f} SAR, "
+        f"the discount is {discount_amount:.2f} SAR, and the final price "
+        f"is {final_price:.2f} SAR."
     )
-    name_entry = ttk.Entry(form)
-    name_entry.grid(row=1, column=0, sticky="ew", pady=(7, 18))
 
-    ttk.Label(form, text="Service price (SAR)", style="Field.TLabel").grid(
-        row=2, column=0, sticky="w"
-    )
-    price_entry = ttk.Entry(form)
-    price_entry.grid(row=3, column=0, sticky="ew", pady=(7, 18))
 
-    results_frame = tk.Frame(
-        page,
-        bg="#ffffff",
-        highlightbackground="#e8dfd8",
-        highlightthickness=1,
-        padx=16,
-        pady=14,
-    )
-    results_frame.grid(row=5, column=0, sticky="nsew", pady=(22, 0))
-    page.rowconfigure(5, weight=1)
-    results_frame.columnconfigure(0, weight=1)
+def render_page(customer_name="", price="", error="", result="", finished=False):
+    """Render the single-screen booking interface."""
+    if finished:
+        content = """
+    <section class="results" aria-live="polite">
+      <h2>Thank you</h2>
+      <p class="result-copy">Thank you for using the Salon Booking System!</p>
+    </section>
+"""
+    else:
+        safe_name = html.escape(customer_name, quote=True)
+        safe_price = html.escape(price, quote=True)
+        error_html = (
+            f'<p class="alert" role="alert">{html.escape(error)}</p>'
+            if error
+            else ""
+        )
+        result_html = html.escape(result) if result else (
+            "Your booking details will appear here after you calculate the price."
+        )
+        content = f"""
+    <form method="post" action="/" novalidate>
+      <label for="customer-name">Customer name</label>
+      <input id="customer-name" name="customer_name" type="text"
+             value="{safe_name}" autocomplete="name" autofocus>
 
-    tk.Label(
-        results_frame,
-        text="Booking details",
-        font=("TkDefaultFont", 12, "bold"),
-        bg="#ffffff",
-        fg="#292421",
-    ).grid(row=0, column=0, sticky="w", pady=(0, 8))
+      <label for="service-price">Service price (SAR)</label>
+      <input id="service-price" name="price" type="text" inputmode="decimal"
+             value="{safe_price}" placeholder="0.00">
 
-    results_text = tk.Text(
-        results_frame,
-        height=11,
-        wrap="word",
-        font=("TkDefaultFont", 10),
-        bg="#ffffff",
-        fg="#292421",
-        relief="flat",
-        borderwidth=0,
-        padx=0,
-        pady=0,
-    )
-    results_text.grid(row=1, column=0, sticky="nsew")
-    results_frame.rowconfigure(1, weight=1)
-    results_text.insert(
-        "1.0", "Your booking details will appear here after you calculate the price."
-    )
-    results_text.configure(state="disabled")
+      {error_html}
 
-    def show_results(text):
-        """Replace the text shown in the booking details area."""
-        results_text.configure(state="normal")
-        results_text.delete("1.0", "end")
-        results_text.insert("1.0", text)
-        results_text.configure(state="disabled")
+      <div class="buttons">
+        <button class="primary" type="submit" name="action" value="calculate">Calculate</button>
+        <button type="submit" name="action" value="add_another">Add Another Customer</button>
+        <button type="submit" name="action" value="clear">Clear</button>
+        <button type="submit" name="action" value="finish">Finish</button>
+      </div>
+    </form>
 
-    def clear_form():
-        """Clear both inputs and the previous booking result."""
-        name_entry.delete(0, "end")
-        price_entry.delete(0, "end")
-        show_results("")
-        name_entry.focus_set()
+    <section class="results" aria-live="polite">
+      <h2>Booking details</h2>
+      <p class="result-copy">{result_html}</p>
+    </section>
+"""
 
-    def calculate_booking():
-        """Validate the inputs, calculate the discount, and show the booking."""
-        customer_name = name_entry.get().strip()
-        price_text = price_entry.get().strip()
+    return PAGE_TEMPLATE.replace("<!-- APP_CONTENT -->", content)
 
+
+class SalonBookingHandler(BaseHTTPRequestHandler):
+    """Serve the browser interface and handle booking form submissions."""
+
+    def do_GET(self):
+        self.send_html(render_page())
+
+    def do_POST(self):
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+            form_body = self.rfile.read(content_length).decode("utf-8")
+            fields = parse_qs(form_body, keep_blank_values=True)
+        except (UnicodeDecodeError, ValueError):
+            self.send_html(render_page(error="Please enter a valid price."))
+            return
+
+        action = fields.get("action", [""])[0]
+        customer_name = fields.get("customer_name", [""])[0].strip()
+        price_text = fields.get("price", [""])[0].strip()
+
+        if action == "finish":
+            self.send_html(render_page(finished=True))
+        elif action in ("clear", "add_another"):
+            self.send_html(render_page())
+        elif action == "calculate":
+            self.calculate_and_respond(customer_name, price_text)
+        else:
+            self.send_html(render_page(error="Please enter a valid price."))
+
+    def calculate_and_respond(self, customer_name, price_text):
         if not customer_name:
-            messagebox.showerror("Missing information", "Please enter the customer name.")
-            name_entry.focus_set()
+            self.send_html(
+                render_page(
+                    customer_name=customer_name,
+                    price=price_text,
+                    error="Please enter the customer name.",
+                )
+            )
             return
 
         if not price_text:
-            messagebox.showerror("Missing information", "Please enter the service price.")
-            price_entry.focus_set()
+            self.send_html(
+                render_page(
+                    customer_name=customer_name,
+                    error="Please enter the service price.",
+                )
+            )
             return
 
         try:
             original_price = float(price_text)
         except ValueError:
-            messagebox.showerror("Invalid price", "Please enter a valid price.")
-            price_entry.focus_set()
+            self.send_html(
+                render_page(
+                    customer_name=customer_name,
+                    price=price_text,
+                    error="Please enter a valid price.",
+                )
+            )
             return
 
         if not math.isfinite(original_price):
-            messagebox.showerror("Invalid price", "Please enter a valid price.")
-            price_entry.focus_set()
+            self.send_html(
+                render_page(
+                    customer_name=customer_name,
+                    price=price_text,
+                    error="Please enter a valid price.",
+                )
+            )
             return
 
         if original_price <= 0:
-            messagebox.showerror("Invalid price", "Price must be a positive number.")
-            price_entry.focus_set()
+            self.send_html(
+                render_page(
+                    customer_name=customer_name,
+                    price=price_text,
+                    error="Price must be a positive number.",
+                )
+            )
             return
 
-        if original_price > DISCOUNT_LIMIT:
-            discount_amount = original_price * DISCOUNT_RATE
-        else:
-            discount_amount = 0
-
-        final_price = original_price - discount_amount
-
-        show_results(
-            f"Customer Name: {customer_name}\n"
-            f"Original Service Price: {original_price:.2f} SAR\n"
-            f"Discount Amount: {discount_amount:.2f} SAR\n"
-            f"Final Price: {final_price:.2f} SAR\n\n"
-            f"Congratulations {customer_name}! Your booking has been completed "
-            f"successfully. The original price is {original_price:.2f} SAR, "
-            f"the discount is {discount_amount:.2f} SAR, and the final price "
-            f"is {final_price:.2f} SAR."
+        self.send_html(
+            render_page(
+                customer_name=customer_name,
+                price=price_text,
+                result=format_booking(customer_name, original_price),
+            )
         )
 
-    def finish():
-        """Thank the employee and close the application."""
-        messagebox.showinfo(
-            "Thank you", "Thank you for using the Salon Booking System!"
-        )
-        root.destroy()
+    def send_html(self, page):
+        response = page.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(response)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(response)
 
-    buttons = ttk.Frame(page)
-    buttons.grid(row=4, column=0, sticky="ew")
-    buttons.columnconfigure(0, weight=1)
-    buttons.columnconfigure(1, weight=1)
+    def log_message(self, format_string, *args):
+        """Keep routine requests quiet in the workflow log."""
 
-    ttk.Button(
-        buttons,
-        text="Calculate",
-        style="Primary.TButton",
-        command=calculate_booking,
-    ).grid(row=0, column=0, sticky="ew", padx=(0, 6), pady=(0, 8))
-    ttk.Button(
-        buttons,
-        text="Add Another Customer",
-        command=clear_form,
-    ).grid(row=0, column=1, sticky="ew", padx=(6, 0), pady=(0, 8))
-    ttk.Button(buttons, text="Clear", command=clear_form).grid(
-        row=1, column=0, sticky="ew", padx=(0, 6)
-    )
-    ttk.Button(buttons, text="Finish", command=finish).grid(
-        row=1, column=1, sticky="ew", padx=(6, 0)
-    )
 
-    name_entry.focus_set()
-    root.mainloop()
+def main():
+    """Start the Replit Preview web server."""
+    port = int(os.environ.get("PORT", "8000"))
+    server = ThreadingHTTPServer(("0.0.0.0", port), SalonBookingHandler)
+    print(f"Salon Booking System is listening on port {port}.")
+    server.serve_forever()
 
 
 if __name__ == "__main__":

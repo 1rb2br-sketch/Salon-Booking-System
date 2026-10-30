@@ -1,0 +1,1 @@
+- [Salon Booking language](salon-booking-language.md) — Keep Python as the app's primary programming language.
