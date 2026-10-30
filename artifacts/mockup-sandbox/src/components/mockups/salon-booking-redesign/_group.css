@@ -1,0 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap");
+
+.salon-booking-extract {
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 18px;
+  display: grid;
+  place-items: center;
+  color: #292421;
+  background: #f7f3ef;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.salon-booking-extract *,
+.salon-booking-extract *::before,
+.salon-booking-extract *::after {
+  box-sizing: border-box;
+}

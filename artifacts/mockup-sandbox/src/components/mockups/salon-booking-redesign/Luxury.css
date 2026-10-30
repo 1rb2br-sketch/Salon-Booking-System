@@ -1,0 +1,338 @@
+.salon-booking-luxury {
+  --lux-ink: #533f43;
+  --lux-muted: #8b7778;
+  --lux-rose: #a86672;
+  --lux-deep-rose: #8c4f5c;
+  --lux-blush: #f3e3e3;
+  --lux-ivory: #fffaf5;
+  --lux-paper: #fffdf9;
+  --lux-gold: #c3a36f;
+  --lux-line: #eadbd4;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(22px, 5vw, 72px) 18px;
+  color: var(--lux-ink);
+  background:
+    radial-gradient(ellipse at 12% 20%, rgba(227, 194, 196, 0.43), transparent 34%),
+    radial-gradient(ellipse at 90% 82%, rgba(232, 215, 187, 0.32), transparent 31%),
+    #f8efeb;
+  font-family: "DM Sans", sans-serif;
+}
+
+.salon-booking-luxury::before,
+.salon-booking-luxury::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  border: 1px solid rgba(195, 163, 111, 0.25);
+  border-radius: 50%;
+}
+
+.salon-booking-luxury::before {
+  top: -128px;
+  right: -88px;
+  width: 340px;
+  height: 340px;
+  box-shadow: 0 0 0 18px rgba(255, 250, 245, 0.15), 0 0 0 38px rgba(195, 163, 111, 0.06);
+}
+
+.salon-booking-luxury::after {
+  bottom: -158px;
+  left: -104px;
+  width: 390px;
+  height: 390px;
+  box-shadow: 0 0 0 22px rgba(255, 250, 245, 0.18), 0 0 0 48px rgba(168, 102, 114, 0.05);
+}
+
+.salon-booking-luxury,
+.salon-booking-luxury *,
+.salon-booking-luxury *::before,
+.salon-booking-luxury *::after {
+  box-sizing: border-box;
+}
+
+.salon-booking-luxury main {
+  position: relative;
+  width: min(100%, 588px);
+  padding: clamp(26px, 5vw, 48px);
+  border: 1px solid rgba(226, 208, 197, 0.9);
+  border-radius: 27px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.84), transparent 40%),
+    var(--lux-ivory);
+  box-shadow:
+    0 32px 74px rgba(96, 59, 59, 0.12),
+    0 8px 22px rgba(122, 81, 73, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: salon-luxury-enter 680ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.salon-booking-luxury main::before {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  bottom: 17px;
+  left: 17px;
+  border: 1px solid rgba(195, 163, 111, 0.13);
+  border-radius: 19px;
+  content: "";
+  pointer-events: none;
+}
+
+.salon-booking-luxury .eyebrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 17px;
+  color: var(--lux-rose);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.21em;
+  text-transform: uppercase;
+}
+
+.salon-booking-luxury .eyebrow::before,
+.salon-booking-luxury .eyebrow::after {
+  width: 24px;
+  height: 1px;
+  background: var(--lux-gold);
+  content: "";
+}
+
+.salon-booking-luxury h1 {
+  position: relative;
+  margin: 0;
+  color: #65484e;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(39px, 7vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.salon-booking-luxury .intro {
+  position: relative;
+  max-width: 380px;
+  margin: 15px 0 32px;
+  color: var(--lux-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.salon-booking-luxury form {
+  position: relative;
+}
+
+.salon-booking-luxury label {
+  display: block;
+  margin: 0 0 9px;
+  color: #665456;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.salon-booking-luxury input {
+  display: block;
+  width: 100%;
+  height: 52px;
+  margin: 0 0 21px;
+  padding: 0 16px;
+  border: 1px solid #e5d5cf;
+  border-radius: 12px;
+  outline: 0;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--lux-ink);
+  font: 500 14px "DM Sans", sans-serif;
+  box-shadow: inset 0 2px 4px rgba(98, 67, 67, 0.025);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.salon-booking-luxury input::placeholder {
+  color: #b4a3a0;
+}
+
+.salon-booking-luxury input:focus {
+  border-color: #c99b9f;
+  outline: 3px solid rgba(168, 102, 114, 0.13);
+  background: #fff;
+}
+
+.salon-booking-luxury .buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+  margin-top: 5px;
+}
+
+.salon-booking-luxury button {
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid #e3d4cd;
+  border-radius: 12px;
+  background: #fffdfb;
+  color: #755d60;
+  font: 600 12px "DM Sans", sans-serif;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.salon-booking-luxury button:hover {
+  transform: translateY(-2px);
+  background: #f8efec;
+}
+
+.salon-booking-luxury button:active {
+  transform: translateY(0);
+}
+
+.salon-booking-luxury button:focus-visible {
+  outline: 3px solid rgba(168, 102, 114, 0.25);
+  outline-offset: 2px;
+}
+
+.salon-booking-luxury button.primary {
+  border-color: var(--lux-rose);
+  background: var(--lux-rose);
+  color: #fffaf7;
+  box-shadow: 0 7px 15px rgba(168, 102, 114, 0.18);
+}
+
+.salon-booking-luxury button.primary:hover {
+  background: var(--lux-deep-rose);
+}
+
+.salon-booking-luxury .results {
+  position: relative;
+  margin-top: 29px;
+  padding: 22px 22px 20px;
+  overflow: hidden;
+  border: 1px solid #e8d8ce;
+  border-radius: 17px;
+  background:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.78), transparent 70%),
+    #f8efea;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.9), 0 6px 16px rgba(112, 73, 69, 0.045);
+}
+
+.salon-booking-luxury .results::after {
+  position: absolute;
+  top: -42px;
+  right: -28px;
+  width: 128px;
+  height: 128px;
+  border: 1px solid rgba(195, 163, 111, 0.24);
+  border-radius: 50%;
+  content: "";
+  box-shadow: 0 0 0 10px rgba(195, 163, 111, 0.045);
+  pointer-events: none;
+}
+
+.salon-booking-luxury .result-heading {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.salon-booking-luxury .check-mark {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  place-items: center;
+  border: 1px solid rgba(195, 163, 111, 0.57);
+  border-radius: 50%;
+  background: rgba(255, 253, 249, 0.84);
+  color: var(--lux-rose);
+  font-size: 15px;
+  line-height: 1;
+  animation: salon-check-appear 550ms 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.salon-booking-luxury .results h2 {
+  margin: 0;
+  color: #684d51;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.salon-booking-luxury .result-copy {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #887576;
+  font-size: 12px;
+  line-height: 1.75;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.salon-booking-luxury .discount-details,
+.salon-booking-luxury .final-price {
+  animation: salon-detail-appear 450ms 220ms ease-out both;
+}
+
+@keyframes salon-luxury-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes salon-check-appear {
+  from { opacity: 0; transform: scale(0.72); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes salon-detail-appear {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 520px) {
+  .salon-booking-luxury {
+    padding: 22px 14px;
+  }
+
+  .salon-booking-luxury main {
+    padding: 31px 23px;
+    border-radius: 22px;
+  }
+
+  .salon-booking-luxury main::before {
+    inset: 11px;
+    border-radius: 15px;
+  }
+
+  .salon-booking-luxury .intro {
+    margin-bottom: 26px;
+  }
+
+  .salon-booking-luxury .buttons {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .salon-booking-luxury .results {
+    padding: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-booking-luxury *,
+  .salon-booking-luxury *::before,
+  .salon-booking-luxury *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
