@@ -1,0 +1,36 @@
+Prompt
+Program:
+Create a Salon Booking System that helps salon employees enter customer names and service prices, calculate discounts, and display booking details in an organized way.
+Language:
+Use Python to build a simple application with a graphical user interface (GUI). The app should be suitable for beginners and easy to use.
+Screen:
+Create one simple screen that includes:
+A text box to enter the customer’s name.
+A text box to enter the service price in SAR.
+A “Calculate” button to calculate the discount and final price.
+An “Add Another Customer” button to enter another customer.
+A “Clear” button to clear the input boxes and results.
+A “Finish” button to finish using the application.
+A results area below the buttons to display the booking details.
+Rules:
+If the service price is more than 150 SAR, then apply a 15% discount.
+If the service price is 150 SAR or less, then the discount is 0 SAR.
+If the service price is more than 150 SAR, then calculate the discount as service price multiplied by 0.15.
+Calculate the final price by subtracting the discount from the original price.
+If the employee clicks “Add Another Customer”, then clear the input boxes and allow the employee to enter another customer’s information.
+If the employee clicks “Finish”, then display a thank-you message and finish using the application.
+Wrong Inputs:
+If the customer name is empty, then show “Please enter the customer name.”
+If the service price is empty, then show “Please enter the service price.”
+If the service price is not a valid number, then show “Please enter a valid price.”
+If the service price is zero or negative, then show “Price must be a positive number.”
+Output:
+After clicking the “Calculate” button, display:
+Customer Name
+Original Service Price
+Discount Amount
+Final Price
+Display a friendly confirmation message:
+“Congratulations [Customer Name]! Your booking has been completed successfully. The original price is [Original Price] SAR, the discount is [Discount Amount] SAR, and the final price is [Final Price] SAR.”
+Keep it simple:
+Use one simple screen with clear labels, input boxes, and buttons. Make the application easy to use and visually organized. Do not add unnecessary features.
