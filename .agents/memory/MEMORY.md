@@ -1,3 +1,4 @@
 - [Salon Booking language](salon-booking-language.md) — Keep Python as the app's primary programming language.
+- [Salon Booking visual direction](salon-booking-visual-direction.md) — Keep its single-screen luxury salon styling consistent across future UI changes.
 - [Replit port routing](replit-port-routing.md) — Explicit port mappings disable automatic detection and must include all active service ports.
 - [Artifact service working directories](artifact-working-directory.md) — Development commands run from the artifact directory; production run args resolve from the workspace root.

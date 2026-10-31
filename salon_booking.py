@@ -517,7 +517,7 @@ PAGE_TEMPLATE = """<!doctype html>
         heading.append(marker);
       }
 
-      resultCopy.replaceChildren(...originalText.split("\n").map((line) => {
+      resultCopy.replaceChildren(...originalText.split("\\n").map((line) => {
         const item = document.createElement("span");
         if (!line) {
           item.className = "result-spacer";

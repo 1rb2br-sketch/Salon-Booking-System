@@ -243,21 +243,6 @@
   margin-bottom: 12px;
 }
 
-.salon-booking-luxury .check-mark {
-  display: grid;
-  width: 29px;
-  height: 29px;
-  flex: 0 0 29px;
-  place-items: center;
-  border: 1px solid rgba(195, 163, 111, 0.57);
-  border-radius: 50%;
-  background: rgba(255, 253, 249, 0.84);
-  color: var(--lux-rose);
-  font-size: 15px;
-  line-height: 1;
-  animation: salon-check-appear 550ms 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-}
-
 .salon-booking-luxury .results h2 {
   margin: 0;
   color: #684d51;
@@ -286,11 +271,6 @@
 @keyframes salon-luxury-enter {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes salon-check-appear {
-  from { opacity: 0; transform: scale(0.72); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes salon-detail-appear {

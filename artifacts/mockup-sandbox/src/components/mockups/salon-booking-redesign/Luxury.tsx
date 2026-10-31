@@ -48,7 +48,6 @@ export function Luxury() {
 
         <section className="results" aria-live="polite">
           <div className="result-heading">
-            <span className="check-mark" aria-hidden="true">✓</span>
             <h2>Booking details</h2>
           </div>
           <p className="result-copy">
