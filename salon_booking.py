@@ -7,7 +7,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs
 
 
+# Service prices above this value qualify for the discount.
 DISCOUNT_LIMIT = 150
+# The discount rate is 15 percent.
 DISCOUNT_RATE = 0.15
 
 
@@ -538,13 +540,16 @@ PAGE_TEMPLATE = """<!doctype html>
 """
 
 
+# Calculate the discount and final price, then build the booking summary.
 def format_booking(customer_name, original_price):
     """Apply the salon discount rule and return the booking summary."""
+    # Apply 15% only when the service price is above the discount limit.
     discount_amount = (
         original_price * DISCOUNT_RATE
         if original_price > DISCOUNT_LIMIT
         else 0
     )
+    # Subtract the discount to get the amount the customer pays.
     final_price = original_price - discount_amount
 
     return (
@@ -559,6 +564,7 @@ def format_booking(customer_name, original_price):
     )
 
 
+# Build the browser page with the form or the finished booking message.
 def render_page(customer_name="", price="", error="", result="", finished=False):
     """Render the single-screen booking interface."""
     if finished:
@@ -569,6 +575,7 @@ def render_page(customer_name="", price="", error="", result="", finished=False)
     </section>
 """
     else:
+        # Escape customer input before placing it in the page.
         safe_name = html.escape(customer_name, quote=True)
         safe_price = html.escape(price, quote=True)
         error_html = (
@@ -615,6 +622,7 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
         self.send_html(render_page())
 
     def do_POST(self):
+        # Read and parse the values sent by the booking form.
         try:
             content_length = int(self.headers.get("Content-Length", "0"))
             form_body = self.rfile.read(content_length).decode("utf-8")
@@ -623,7 +631,9 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
             self.send_html(render_page(error="Please enter a valid price."))
             return
 
+        # Find which button the customer clicked.
         action = fields.get("action", [""])[0]
+        # Keep the customer name and service price as text until validation.
         customer_name = fields.get("customer_name", [""])[0].strip()
         price_text = fields.get("price", [""])[0].strip()
 
@@ -636,7 +646,9 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
         else:
             self.send_html(render_page(error="Please enter a valid price."))
 
+    # Validate the name and price before calculating the booking.
     def calculate_and_respond(self, customer_name, price_text):
+        # A customer name is required.
         if not customer_name:
             self.send_html(
                 render_page(
@@ -647,6 +659,7 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
             )
             return
 
+        # A service price is required.
         if not price_text:
             self.send_html(
                 render_page(
@@ -657,6 +670,7 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
             return
 
         try:
+            # Convert the entered price from text to a number.
             original_price = float(price_text)
         except ValueError:
             self.send_html(
@@ -668,6 +682,7 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
             )
             return
 
+        # Reject values that are not finite numbers, such as infinity.
         if not math.isfinite(original_price):
             self.send_html(
                 render_page(
@@ -678,6 +693,7 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
             )
             return
 
+        # The service price must be greater than zero.
         if original_price <= 0:
             self.send_html(
                 render_page(
@@ -711,9 +727,12 @@ class SalonBookingHandler(BaseHTTPRequestHandler):
 
 def main():
     """Start the Replit Preview web server."""
+    # Use Replit's port, or 8000 when running locally.
     port = int(os.environ.get("PORT", "8000"))
+    # Connect browser requests to the booking handler.
     server = ThreadingHTTPServer(("0.0.0.0", port), SalonBookingHandler)
     print(f"Salon Booking System is listening on port {port}.")
+    # Keep listening for requests; this is the server's main loop.
     server.serve_forever()
 
 
